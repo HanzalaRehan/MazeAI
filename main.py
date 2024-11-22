@@ -1,3 +1,10 @@
+"""
+Author(s): 1. Hanzala B. Rehan
+Description: Main Entry point for this project
+Date created: November 15th, 2024
+Date last modified: November 22nd, 2024
+"""
+
 import argparse
 from maze import Maze
 from display import GridDisplay

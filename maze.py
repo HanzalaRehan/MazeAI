@@ -1,5 +1,7 @@
 """
-Author(s): 1. Hanzala B. Rehan
+Author(s):  1. Hanzala B. Rehan
+            2. Amna Akhtar Nawabi
+            3. Abdullah Janjua
 Description: This script defines a class `Maze` which generates a random,
             solvable maze using Depth-First Search (DFS) algorithm.
 Date created: November 15th, 2024

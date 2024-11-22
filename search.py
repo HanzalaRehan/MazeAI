@@ -1,8 +1,10 @@
 """
-Author(s): 1. Hanzala B. Rehan
+Author(s):  1. Hanzala B. Rehan
+            2. Amna Akhtar Nawabi
+            3. Abdullah Janjua
 Description: Uses BFS, DFS, Greedy and A* Search.
 Date created: November 18th, 2024
-Date last modified: November 18th, 2024
+Date last modified: November 22nd, 2024
 """
 
 from util import Node, CostNode, StackFrontier, QueueFrontier, PriorityQueueFrontier, manhattan_distance,\

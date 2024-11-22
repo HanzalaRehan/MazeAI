@@ -1,10 +1,12 @@
 """
-Author(s): 1. Hanzala B. Rehan
+Author(s):  1. Hanzala B. Rehan
+            2. Amna Akhtar Nawabi
+            3. Abdullah Janjua
 Description: This script defines several classes used for search algorithms in pathfinding or puzzle-solving problems.
              It includes `Node` to represent states in the search tree, `StackFrontier` for Depth-First Search (DFS),
              `QueueFrontier` for Breadth-First Search (BFS), and `PriorityQueueFrontier` for informed searches like A*.
 Date created: November 15th, 2024
-Date last modified: November 15th, 2024
+Date last modified: November 18th, 2024
 """
 
 
