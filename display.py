@@ -2,7 +2,7 @@
 Author(s): 1. Hanzala B. Rehan
 Description: A script to display a 2D grid represented as a list of characters using pygame, implemented as a class, with buttons for search algorithms.
 Date created: November 15th, 2024
-Date last modified: November 22nd, 2024
+Date last modified: November 23rd, 2024
 """
 
 import pygame
@@ -84,6 +84,12 @@ class GridDisplay:
             "AFS": pygame.Rect(
                 self.BUTTON_PADDING,
                 self.BUTTON_PADDING * 4 + self.BUTTON_HEIGHT * 3,
+                self.BUTTON_WIDTH,
+                self.BUTTON_HEIGHT,
+            ),
+            "Reset": pygame.Rect(
+                self.BUTTON_PADDING,
+                self.BUTTON_PADDING * 5 + self.BUTTON_HEIGHT * 4,
                 self.BUTTON_WIDTH,
                 self.BUTTON_HEIGHT,
             ),
@@ -205,6 +211,51 @@ class GridDisplay:
             pygame.draw.rect(self.screen, self.COLOR_BORDER, rect, 1)
             pygame.display.flip()
 
+    def reset(self):
+        """
+        Desc: Resets the grid, clearing the explored and path tiles.
+        returns:
+            None
+        """
+        self.explored_tiles = []
+        self.path_tiles = []
+        self.grid = self.maze.get_maze()
+        self.start = self.maze.start
+        self.draw_grid()
+
+    def search(self, label):
+        if label == "DFS":
+            path, explored = depth_first_search(self.start, self.maze)
+            for tile in explored:
+                self.explore_maze([tile])
+                pygame.time.delay(50)
+
+            self.draw_path(path)
+
+        elif label == "BFS":
+            path, explored = breadth_first_search(self.start, self.maze)
+            for tile in explored:
+                self.explore_maze([tile])
+                pygame.time.delay(50)
+
+            self.draw_path(path)
+
+        elif label == "GFS":
+            path, explored = greedy_first_search(self.start, self.maze)
+            for tile in explored:
+                self.explore_maze([tile])
+                pygame.time.delay(50)
+
+            self.draw_path(path)
+
+        elif label == "AFS":
+            path, explored = astar_first_search(self.start, self.maze)
+            for tile in explored:
+                self.explore_maze([tile])
+                pygame.time.delay(50)
+
+            self.draw_path(path)
+
     def run(self):
         """
         Desc: Runs the pygame loop to display the grid and buttons.
@@ -227,37 +278,10 @@ class GridDisplay:
                     mouse_pos = pygame.mouse.get_pos()
                     for label, rect in self.buttons.items():
                         if rect.collidepoint(mouse_pos):
-                            if label == "DFS":
-                                path, explored = depth_first_search(self.start, self.maze)
-                                for tile in explored:
-                                    self.explore_maze([tile])
-                                    pygame.time.delay(50)
-
-                                self.draw_path(path)
-
-                            elif label == "BFS":
-                                path, explored = breadth_first_search(self.start, self.maze)
-                                for tile in explored:
-                                    self.explore_maze([tile])
-                                    pygame.time.delay(50)
-
-                                self.draw_path(path)
-
-                            elif label == "GFS":
-                                path, explored = greedy_first_search(self.start, self.maze)
-                                for tile in explored:
-                                    self.explore_maze([tile])
-                                    pygame.time.delay(50)
-
-                                self.draw_path(path)
-
-                            elif label == "AFS":
-                                path, explored = astar_first_search(self.start, self.maze)
-                                for tile in explored:
-                                    self.explore_maze([tile])
-                                    pygame.time.delay(50)
-
-                                self.draw_path(path)
+                            if label == "Reset":
+                                self.reset()
+                            else:
+                                self.search(label)
 
             clock.tick(30)
 
