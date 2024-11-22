@@ -1,6 +1,7 @@
 """
 Author(s): 1. Hanzala B. Rehan
-Description: A script to display a 2D grid represented as a list of characters using pygame, implemented as a class, with buttons for search algorithms.
+Description: A script to display a 2D grid represented as a list of characters using pygame, implemented as a class,
+            with buttons for search algorithms.
 Date created: November 15th, 2024
 Date last modified: November 23rd, 2024
 """
@@ -15,11 +16,11 @@ class GridDisplay:
     Desc: Class to handle the display of a 2D grid using pygame, with interactive buttons.
     """
 
-    TILE_SIZE = 40  # Size of each grid tile
-    PADDING = 40    # Padding around the grid
-    BUTTON_WIDTH = 75  # Width of buttons
-    BUTTON_HEIGHT = 75  # Height of buttons
-    BUTTON_PADDING = 10  # Spacing between buttons
+    TILE_SIZE = 40                      # Size of each grid tile
+    PADDING = 40                        # Padding around the grid
+    BUTTON_WIDTH = 75                   # Width of buttons
+    BUTTON_HEIGHT = 75                  # Height of buttons
+    BUTTON_PADDING = 10                 # Spacing between buttons
 
     # Colors
     COLOR_WALL = (30, 30, 30)           # Black for walls
@@ -28,8 +29,8 @@ class GridDisplay:
     COLOR_GOAL = (79, 174, 31)          # Green for goal
     COLOR_BG = (0, 0, 0)                # Black background
     COLOR_BORDER = (0, 0, 0)            # Black border for tiles
-    COLOR_EXPLORED = (218, 240, 100)     # Light Red for explored tiles
-    COLOR_PATH_TILE = (210, 80, 73)   # Yellow for path tiles
+    COLOR_EXPLORED = (218, 240, 100)    # Light Red for explored tiles
+    COLOR_PATH_TILE = (210, 80, 73)     # Yellow for path tiles
     COLOR_BUTTON = (100, 100, 255)      # Blue for buttons
     COLOR_BUTTON_HOVER = (50, 50, 200)  # Darker blue for hovered buttons
     COLOR_TEXT = (255, 255, 255)        # White text
@@ -52,8 +53,10 @@ class GridDisplay:
             + self.BUTTON_PADDING
         )
         self.screen_height = max(
-            self.grid_height * self.TILE_SIZE + 2 * self.PADDING,
-            4 * self.BUTTON_HEIGHT + 5 * self.BUTTON_PADDING,
+            self.grid_height * self.TILE_SIZE
+            + 2 * self.PADDING,
+            4 * self.BUTTON_HEIGHT
+            + 5 * self.BUTTON_PADDING,
         )
 
         # Initialize pygame and set up display

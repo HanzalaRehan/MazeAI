@@ -117,9 +117,9 @@ class Maze:
             node (Node): the node to check
         returns:
         (list): A list of tuples representing the next valid states and actions.
-                Each tuple contains (next_state, action), where:
-                    next_state (tuple): The (row, col) coordinates of the next position.
+                Each tuple contains (action, next_state), where:
                     action (str): The move direction ('left', 'right', 'up', 'down').
+                    next_state (tuple): The (row, col) coordinates of the next position.
         """
         # Define possible moves and their corresponding actions
         moves = {

@@ -19,7 +19,7 @@ def breadth_first_search(start, maze):
         start (tuple): The starting position as (row, col).
         maze (Maze): An instance of the Maze class.
     returns:
-        (tuple): A list of actions leading from the start to the goal, guaranteed to be the shortest path.
+        (list): A list of actions leading from the start to the goal, guaranteed to be the shortest path.
                  AND. A list of all the explored states.
     """
 
