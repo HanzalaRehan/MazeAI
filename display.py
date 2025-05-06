@@ -3,12 +3,13 @@ Author(s): 1. Hanzala B. Rehan
 Description: A script to display a 2D grid represented as a list of characters using pygame, implemented as a class,
             with buttons for search algorithms.
 Date created: November 15th, 2024
-Date last modified: November 23rd, 2024
+Date last modified: May 6th, 2024
 """
 
 import pygame
 from maze import Maze
 from search import breadth_first_search, depth_first_search, greedy_first_search, astar_first_search
+from model import best_algo
 
 
 class GridDisplay:
@@ -35,6 +36,8 @@ class GridDisplay:
     COLOR_BUTTON_HOVER = (50, 50, 200)  # Darker blue for hovered buttons
     COLOR_TEXT = (255, 255, 255)        # White text
 
+    STRING = "MAZE AI"
+
     def __init__(self, maze):
         """
         Desc: Initializes the GridDisplay class.
@@ -54,14 +57,15 @@ class GridDisplay:
         )
         self.screen_height = max(
             self.grid_height * self.TILE_SIZE
-            + 2 * self.PADDING,
+            + 2 * self.PADDING + 30,
             4 * self.BUTTON_HEIGHT
-            + 5 * self.BUTTON_PADDING,
-        )
+            + 5 * self.BUTTON_PADDING + 30,
+        ) # Additional 30 for Text
 
         # Initialize pygame and set up display
         pygame.init()
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+        self.font = pygame.font.Font(None, 48)
         pygame.display.set_caption("AI Maze Solver")
 
         # Button positions
@@ -90,9 +94,15 @@ class GridDisplay:
                 self.BUTTON_WIDTH,
                 self.BUTTON_HEIGHT,
             ),
-            "Reset": pygame.Rect(
+            "ML": pygame.Rect(
                 self.BUTTON_PADDING,
                 self.BUTTON_PADDING * 5 + self.BUTTON_HEIGHT * 4,
+                self.BUTTON_WIDTH,
+                self.BUTTON_HEIGHT,
+            ),
+            "Reset": pygame.Rect(
+                self.BUTTON_PADDING,
+                self.BUTTON_PADDING * 6 + self.BUTTON_HEIGHT * 5,
                 self.BUTTON_WIDTH,
                 self.BUTTON_HEIGHT,
             ),
@@ -227,7 +237,12 @@ class GridDisplay:
         self.draw_grid()
 
     def search(self, label):
+        if label == "ML":
+            self.STRING = "ALGO: COMPUTING..."
+            label = best_algo(self.maze)
+
         if label == "DFS":
+            self.STRING = "ALGO: DFS"
             path, explored = depth_first_search(self.start, self.maze)
             for tile in explored:
                 self.explore_maze([tile])
@@ -236,6 +251,7 @@ class GridDisplay:
             self.draw_path(path)
 
         elif label == "BFS":
+            self.STRING = "ALGO: BFS"
             path, explored = breadth_first_search(self.start, self.maze)
             for tile in explored:
                 self.explore_maze([tile])
@@ -244,6 +260,7 @@ class GridDisplay:
             self.draw_path(path)
 
         elif label == "GFS":
+            self.STRING = "ALGO: GFS"
             path, explored = greedy_first_search(self.start, self.maze)
             for tile in explored:
                 self.explore_maze([tile])
@@ -252,12 +269,14 @@ class GridDisplay:
             self.draw_path(path)
 
         elif label == "AFS":
+            self.STRING = "ALGO: AFS"
             path, explored = astar_first_search(self.start, self.maze)
             for tile in explored:
                 self.explore_maze([tile])
                 pygame.time.delay(50)
 
             self.draw_path(path)
+
 
     def run(self):
         """
@@ -269,9 +288,13 @@ class GridDisplay:
         clock = pygame.time.Clock()
 
         while running:
+            title_text = self.font.render(self.STRING, True, pygame.Color("Green"))
+            title_rect = title_text.get_rect(center=(self.screen.get_width() // 2, self.screen_height - 35))
+
             self.screen.fill(self.COLOR_BG)
             self.draw_grid()
             self.draw_buttons()
+            self.screen.blit(title_text, title_rect)
             pygame.display.flip()
 
             for event in pygame.event.get():

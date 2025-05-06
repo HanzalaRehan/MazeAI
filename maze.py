@@ -1,16 +1,16 @@
 """
 Author(s):  1. Hanzala B. Rehan
-            2. Amna Akhtar Nawabi
-            3. Abdullah Janjua
 Description: This script defines a class `Maze` which generates a random,
             solvable maze using Depth-First Search (DFS) algorithm.
 Date created: November 15th, 2024
-Date last modified: November 18th, 2024
+Date last modified: May 5th, 2025
 """
 
 
 import random
 from util import Node
+from collections import deque
+import random
 
 
 class Maze:
@@ -19,61 +19,142 @@ class Maze:
         """
         Desc: Initializes the maze with the specified number of rows and columns.
         Parameters:
-            rows (int): Number of rows in the maze.
-            cols (int): Number of columns in the maze.
+            rows (int): Odd number of rows in the maze.
+            cols (int): Odd number of columns in the maze.
         """
         self.goal = None
         self.start = None
-        self.rows = rows  # Number of rows in the maze
-        self.cols = cols  # Number of columns in the maze
+        self.rows = rows if rows % 2 == 1 else rows + 1  # Number of rows, Ensuring odd number of rows.
+        self.cols = cols if cols % 2 == 1 else cols + 1  # Number of columns, Ensuring odd number of rows.
         self.maze = self.generate_solvable_maze()  # Generates a solvable maze upon initialization
 
     def generate_solvable_maze(self):
         """
-        Desc: Generates a solvable maze using Depth-First Search (DFS) algorithm.
-        returns:
-        (list): A 2D list representing the maze layout with 'S' as the start, 'G' as the goal,
-                and '#' as the walls.
+        Generates a more complex and less predictable maze using a modified DFS algorithm.
+        Returns a 2D list representing the maze with:
+            'S' = start, 'G' = goal, ' ' = path, '#' = wall
         """
-        # Initialize maze with walls ('#')
+        # Ensure odd dimensions for proper path spacing
+        self.rows |= 1
+        self.cols |= 1
+
+        # Initialize all cells as walls
         maze = [['#' for _ in range(self.cols)] for _ in range(self.rows)]
 
-        # Randomly select a starting point ('S')
-        start_row, start_col = random.randint(0, self.rows - 1), random.randint(0, self.cols - 1)
-        maze[start_row][start_col] = 'S'  # Set the start point on the maze
+        # Choose a random odd cell to start
+        start_row = random.randrange(1, self.rows, 2)
+        start_col = random.randrange(1, self.cols, 2)
+        maze[start_row][start_col] = 'S'
         self.start = (start_row, start_col)
 
-        # Stack to perform DFS for maze generation
+        # DFS stack and directions
         stack = [(start_row, start_col)]
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # R, D, L, U
 
-        # Directions to move in the maze: right, down, left, up
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # Right, Down, Left, Up
-
-        # DFS to carve paths in the maze
         while stack:
             r, c = stack.pop()
 
-            # Shuffle directions to randomize the maze creation
-            random.shuffle(directions)
-            for dr, dc in directions:
-                # Calculate the new row and column two steps ahead (to carve a path)
+            # Bias toward branching: avoid too long corridors
+            biased_dirs = sorted(directions, key=lambda _: random.random() + 0.2 * random.randint(0, 1))
+            for dr, dc in biased_dirs:
                 nr, nc = r + dr * 2, c + dc * 2
 
-                # Check if the new position is within bounds and is a wall ('#')
                 if 0 <= nr < self.rows and 0 <= nc < self.cols and maze[nr][nc] == '#':
-                    maze[r + dr][c + dc] = ' '  # Open the path between cells
-                    maze[nr][nc] = ' '  # Open the next cell
-                    stack.append((nr, nc))  # Add the new position to the stack for further exploration
+                    maze[r + dr][c + dc] = ' '  # Path between
+                    maze[nr][nc] = ' '          # Target cell
+                    stack.append((nr, nc))
 
-        # Place the goal point ('G') in a random open space
-        goal_row, goal_col = start_row, start_col
-        # Ensure goal is not placed at the start and is on an open space
-        while (goal_row, goal_col) == (start_row, start_col) or maze[goal_row][goal_col] == '#':
-            goal_row, goal_col = random.randint(0, self.rows - 1), random.randint(0, self.cols - 1)
-        maze[goal_row][goal_col] = 'G'  # Set the goal point
+        # Replace 'S' with ' ' temporarily to find goal
+        maze[start_row][start_col] = ' '
+        goal_row, goal_col = self.find_farthest_point(maze, (start_row, start_col))
+        maze[goal_row][goal_col] = 'G'
         self.goal = (goal_row, goal_col)
 
-        return maze  # Return the generated maze
+        # Set start point back
+        maze[start_row][start_col] = 'S'
+
+        return maze
+
+    @staticmethod
+    def find_farthest_point(maze, start):
+        """Finds the farthest reachable cell from the start using BFS."""
+        visited = set()
+        queue = deque([(start[0], start[1], 0)])
+        farthest = start
+        max_dist = -1
+
+        while queue:
+            r, c, dist = queue.popleft()
+            if (r, c) in visited:
+                continue
+            visited.add((r, c))
+
+            if dist > max_dist:
+                max_dist = dist
+                farthest = (r, c)
+
+            for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < len(maze) and 0 <= nc < len(maze[0]) and maze[nr][nc] == ' ':
+                    queue.append((nr, nc, dist + 1))
+
+        return farthest
+
+    def generate_maze(self):
+        """
+        Desc: Generates a random maze using Prim's algorithm.
+            Starts from a random position, carves paths by expanding into nearby walls, 
+            and places the goal in a reachable open space.
+        
+        returns:
+        (list): A 2D list representing the maze layout where:
+                '#' is a wall,
+                ' ' is a free path,
+                'S' is the start point, and
+                'G' is the goal point.
+        """
+        # Pick a random starting point (odd-indexed to ensure it's inside the grid)
+        r, c = random.randrange(1, self.rows, 2), random.randrange(1, self.cols, 2)
+        maze = [['#' for _ in range(self.cols)] for _ in range(self.rows)]
+        maze[r][c] = 'S'  # Set starting cell
+        self.start = (r, c)
+
+        # Add neighboring walls (two steps away) to the wall list
+        walls = []
+        for dr, dc in [(-2, 0), (2, 0), (0, -2), (0, 2)]:
+            nr, nc = r + dr, c + dc
+            if 1 <= nr < self.rows - 1 and 1 <= nc < self.cols - 1:
+                walls.append((r + dr, c + dc, dr, dc))
+
+        # Loop until all reachable walls are processed
+        while walls:
+            # Randomly pick a wall
+            wr, wc, dr, dc = walls.pop(random.randint(0, len(walls) - 1))
+            r, c = wr - dr, wc - dc
+
+            # Skip if already connected or visited
+            if maze[wr][wc] == '#' and maze[r][c] == ' ':
+                continue
+
+            if maze[wr][wc] == '#':
+                # Carve path between current cell and wall
+                maze[wr - dr // 2][wc - dc // 2] = ' '
+                maze[wr][wc] = ' '
+
+                # Add neighboring walls of the newly carved cell
+                for ddr, ddc in [(-2, 0), (2, 0), (0, -2), (0, 2)]:
+                    nr, nc = wr + ddr, wc + ddc
+                    if 1 <= nr < self.rows - 1 and 1 <= nc < self.cols - 1 and maze[nr][nc] == '#':
+                        walls.append((wr + ddr, wc + ddc, ddr, ddc))
+
+        # Pick a random open cell as the goal (not the start)
+        empty_spaces = [(r, c) for r in range(self.rows) for c in range(self.cols) if maze[r][c] == ' ']
+        goal_row, goal_col = random.choice(empty_spaces)
+        maze[goal_row][goal_col] = 'G'
+        self.goal = (goal_row, goal_col)
+
+        return maze
+
 
     def print_maze(self):
         """
